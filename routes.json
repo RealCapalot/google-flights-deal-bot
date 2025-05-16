@@ -1,0 +1,42 @@
+[
+  {
+    "origin": "JFK",
+    "destination": "LHR",
+    "description": "New York to London"
+  },
+  {
+    "origin": "LAX",
+    "destination": "NRT",
+    "description": "Los Angeles to Tokyo"
+  },
+  {
+    "origin": "SFO",
+    "destination": "SYD",
+    "description": "San Francisco to Sydney"
+  },
+  {
+    "origin": "ORD",
+    "destination": "HKG",
+    "description": "Chicago to Hong Kong"
+  },
+  {
+    "origin": "MIA",
+    "destination": "GRU",
+    "description": "Miami to São Paulo"
+  },
+  {
+    "origin": "JFK",
+    "destination": "DEL",
+    "description": "New York to Delhi"
+  },
+  {
+    "origin": "LAX",
+    "destination": "SYD",
+    "description": "Los Angeles to Sydney"
+  },
+  {
+    "origin": "SFO",
+    "destination": "SIN",
+    "description": "San Francisco to Singapore"
+  }
+] 
