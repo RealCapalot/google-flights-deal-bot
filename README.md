@@ -15,6 +15,9 @@ A Python-based tool to scrape Google Flights and find the best deals for long fl
 - Date range generation for flexible travel dates
 - Scheduled scraping for continuous monitoring
 - Save results in JSON and CSV formats
+- Proxy support for avoiding rate limits
+- Data visualization tools and dashboards
+- Screenshot capabilities for search results
 
 ## Installation
 
@@ -30,6 +33,11 @@ A Python-based tool to scrape Google Flights and find the best deals for long fl
    ```
 
 3. Make sure you have Chrome installed, as the scraper uses Chrome via Selenium.
+
+4. (Optional) Copy the env.example file to .env and customize settings:
+   ```
+   cp env.example .env
+   ```
 
 ## Usage
 
@@ -49,8 +57,21 @@ The scraper supports several command-line options:
 python main.py --origin SFO --destination NRT \
   --start-date 2023-12-01 --end-date 2024-03-01 \
   --min-duration 8 --min-stay 10 --max-stay 21 \
-  --sort-by price --limit 10 --headless
+  --sort-by price --limit 10 --headless --disable-images
 ```
+
+### Example Script
+
+The included example.py script demonstrates a simple use case:
+
+```bash
+python example.py
+```
+
+This will:
+1. Search for flights from JFK to LHR
+2. Show the top 5 best deals
+3. Create a price visualization chart
 
 ### Command Line Arguments
 
@@ -66,6 +87,9 @@ python main.py --origin SFO --destination NRT \
 - `--limit`: Limit number of results (default: 20)
 - `--headless`: Run browser in headless mode (more efficient)
 - `--one-way`: Search for one-way flights only
+- `--use-proxy`: Use proxy settings from .env file
+- `--disable-images`: Disable images for faster loading
+- `--screenshot`: Take screenshots of search results pages
 
 ## Scheduled Scraping
 
@@ -100,6 +124,42 @@ The scheduler will check each route every `interval` hours (default: 24).
 - `--sort-by`: Sort results by this field (default: price_per_hour)
 - `--limit`: Limit number of results (default: 20)
 - `--headless`: Run browser in headless mode
+- `--use-proxy`: Use proxy settings from .env file
+- `--disable-images`: Disable images for faster loading
+- `--screenshots`: Take screenshots of search results
+
+## Data Visualization
+
+Analyze your flight data with the included visualization tools:
+
+```bash
+python visualize.py --all
+```
+
+This will generate visualization charts for all saved flight data.
+
+Options:
+- `--file`: Visualize a specific data file (e.g., `--file data/JFK_to_LHR_20230101_120000.json`)
+- `--all`: Generate visualizations for all data files
+- `--output-dir`: Directory to save visualization files (default: 'visualizations')
+
+## Proxy Support
+
+To use a proxy for scraping:
+
+1. Configure proxy settings in your .env file:
+   ```
+   USE_PROXY=true
+   PROXY_HOST=your-proxy-host
+   PROXY_PORT=your-proxy-port
+   PROXY_USER=your-username (optional)
+   PROXY_PASS=your-password (optional)
+   ```
+
+2. Enable proxy use with the `--use-proxy` flag:
+   ```bash
+   python main.py --origin SFO --destination NRT --use-proxy
+   ```
 
 ## Results
 

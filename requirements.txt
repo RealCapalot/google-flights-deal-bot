@@ -5,4 +5,7 @@ requests==2.31.0
 beautifulsoup4==4.12.2
 python-dotenv==1.0.0
 tqdm==4.66.1
-schedule==1.2.1 
+schedule==1.2.1
+matplotlib==3.8.2
+seaborn==0.13.0
+tabulate==0.9.0 

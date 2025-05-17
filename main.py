@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 from scrapers.flights_scraper import GoogleFlightsScraper
 from utils.date_utils import generate_date_pairs, get_next_n_months_date_range
+from utils.config import get_proxy_url
 
 def save_results(results, filename):
     """Save results to JSON and CSV files"""
@@ -42,6 +43,9 @@ def main():
     parser.add_argument('--limit', type=int, default=20, help='Limit number of results')
     parser.add_argument('--headless', action='store_true', help='Run browser in headless mode')
     parser.add_argument('--one-way', action='store_true', help='Search for one-way flights only')
+    parser.add_argument('--use-proxy', action='store_true', help='Use proxy settings from .env file')
+    parser.add_argument('--disable-images', action='store_true', help='Disable images for faster loading')
+    parser.add_argument('--screenshot', action='store_true', help='Take screenshot of each search results page')
     
     args = parser.parse_args()
     
@@ -52,8 +56,16 @@ def main():
     else:
         start_date, end_date = get_next_n_months_date_range(args.months_ahead)
     
+    # Get proxy URL if enabled
+    proxy_url = get_proxy_url() if args.use_proxy else None
+    
     # Initialize scraper
-    scraper = GoogleFlightsScraper(headless=args.headless, min_duration_hours=args.min_duration)
+    scraper = GoogleFlightsScraper(
+        headless=args.headless, 
+        min_duration_hours=args.min_duration,
+        proxy_url=proxy_url,
+        disable_images=args.disable_images
+    )
     
     try:
         all_results = []
@@ -76,6 +88,10 @@ def main():
                     args.destination, 
                     departure_date
                 )
+                
+                if args.screenshot:
+                    screenshot_name = f"{args.origin}_to_{args.destination}_{departure_date}.png"
+                    scraper.take_screenshot(screenshot_name)
                 
                 if results:
                     best_deals = scraper.find_best_deals(results, args.sort_by, args.limit)
@@ -108,6 +124,10 @@ def main():
                     departure_date,
                     return_date
                 )
+                
+                if args.screenshot:
+                    screenshot_name = f"{args.origin}_to_{args.destination}_{departure_date}_to_{return_date}.png"
+                    scraper.take_screenshot(screenshot_name)
                 
                 if results:
                     best_deals = scraper.find_best_deals(results, args.sort_by, args.limit)

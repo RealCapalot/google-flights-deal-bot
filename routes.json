@@ -15,9 +15,19 @@
     "description": "San Francisco to Sydney"
   },
   {
+    "origin": "JFK",
+    "destination": "FCO",
+    "description": "New York to Rome"
+  },
+  {
     "origin": "ORD",
     "destination": "HKG",
     "description": "Chicago to Hong Kong"
+  },
+  {
+    "origin": "LAX",
+    "destination": "SIN",
+    "description": "Los Angeles to Singapore"
   },
   {
     "origin": "MIA",
@@ -38,5 +48,15 @@
     "origin": "SFO",
     "destination": "SIN",
     "description": "San Francisco to Singapore"
+  },
+  {
+    "origin": "JFK",
+    "destination": "CDG",
+    "description": "New York to Paris"
+  },
+  {
+    "origin": "SEA",
+    "destination": "ICN",
+    "description": "Seattle to Seoul"
   }
 ] 

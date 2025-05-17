@@ -10,17 +10,23 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.os_manager import ChromeType
+import os
 
 class GoogleFlightsScraper:
-    def __init__(self, headless=True, min_duration_hours=6):
+    def __init__(self, headless=True, min_duration_hours=6, proxy_url=None, disable_images=True):
         """
         Initialize the Google Flights scraper.
         
         Args:
             headless (bool): Run browser in headless mode
             min_duration_hours (int): Minimum flight duration in hours to consider as "long flight"
+            proxy_url (str): Proxy URL in format http://user:pass@host:port or http://host:port
+            disable_images (bool): Whether to disable images for faster loading
         """
         self.min_duration_hours = min_duration_hours
+        self.proxy_url = proxy_url
+        self.disable_images = disable_images
         self.setup_browser(headless)
         self.logger = self.setup_logger()
     
@@ -42,7 +48,7 @@ class GoogleFlightsScraper:
         chrome_options = Options()
         
         if headless:
-            chrome_options.add_argument("--headless")
+            chrome_options.add_argument("--headless=new")
         
         chrome_options.add_argument("--window-size=1920,1080")
         chrome_options.add_argument("--disable-notifications")
@@ -53,12 +59,27 @@ class GoogleFlightsScraper:
         chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
         chrome_options.add_experimental_option("useAutomationExtension", False)
         
-        service = Service(ChromeDriverManager().install())
-        self.driver = webdriver.Chrome(service=service, options=chrome_options)
+        # Add proxy if specified
+        if self.proxy_url:
+            chrome_options.add_argument(f'--proxy-server={self.proxy_url}')
+        
+        # Disable images if requested
+        if self.disable_images:
+            chrome_prefs = {"profile.managed_default_content_settings.images": 2}
+            chrome_options.add_experimental_option("prefs", chrome_prefs)
+        
+        # Use the latest Chrome driver
+        try:
+            service = Service(ChromeDriverManager().install())
+            self.driver = webdriver.Chrome(service=service, options=chrome_options)
+        except Exception as e:
+            # Fallback to installed Chrome
+            service = Service(ChromeDriverManager(chrome_type=ChromeType.GOOGLE).install())
+            self.driver = webdriver.Chrome(service=service, options=chrome_options)
         
         # Set user agent to avoid detection
         self.driver.execute_cdp_cmd("Network.setUserAgentOverride", {
-            "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
         })
         
         # Disable webdriver flags to avoid detection
@@ -256,6 +277,35 @@ class GoogleFlightsScraper:
         """
         flights = self.search_flights(origin, destination, departure_date, return_date)
         return self.find_best_deals(flights, sort_by, limit)
+    
+    def take_screenshot(self, filename=None):
+        """
+        Take a screenshot of the current browser window.
+        
+        Args:
+            filename (str, optional): Custom filename, default is screenshot_TIMESTAMP.png
+            
+        Returns:
+            str: Path to the saved screenshot
+        """
+        if not filename:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"screenshot_{timestamp}.png"
+        
+        # Ensure the filename has .png extension
+        if not filename.lower().endswith('.png'):
+            filename += '.png'
+        
+        # Create screenshots directory if it doesn't exist
+        screenshots_dir = 'screenshots'
+        os.makedirs(screenshots_dir, exist_ok=True)
+        
+        # Save the screenshot
+        filepath = os.path.join(screenshots_dir, filename)
+        self.driver.save_screenshot(filepath)
+        self.logger.info(f"Screenshot saved to {filepath}")
+        
+        return filepath
     
     def close(self):
         """Close the browser"""

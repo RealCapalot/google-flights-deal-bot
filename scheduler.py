@@ -8,6 +8,7 @@ from datetime import datetime
 
 from scrapers.flights_scraper import GoogleFlightsScraper
 from utils.date_utils import get_next_n_months_date_range, generate_date_pairs
+from utils.config import get_proxy_url
 
 # Configure logging
 logging.basicConfig(
@@ -31,7 +32,8 @@ def load_routes(routes_file):
         return []
 
 def scrape_route(route, months_ahead=3, min_duration=6, min_stay=7, max_stay=14, 
-                sort_by="price_per_hour", limit=20, headless=True):
+                sort_by="price_per_hour", limit=20, headless=True, use_proxy=False, 
+                disable_images=True, take_screenshots=False):
     """Scrape a single route and save results"""
     origin = route["origin"]
     destination = route["destination"]
@@ -39,8 +41,16 @@ def scrape_route(route, months_ahead=3, min_duration=6, min_stay=7, max_stay=14,
     # Get date range
     start_date, end_date = get_next_n_months_date_range(months_ahead)
     
+    # Get proxy URL if enabled
+    proxy_url = get_proxy_url() if use_proxy else None
+    
     # Initialize scraper
-    scraper = GoogleFlightsScraper(headless=headless, min_duration_hours=min_duration)
+    scraper = GoogleFlightsScraper(
+        headless=headless, 
+        min_duration_hours=min_duration,
+        proxy_url=proxy_url,
+        disable_images=disable_images
+    )
     
     try:
         # Generate date pairs for round trips
@@ -65,6 +75,10 @@ def scrape_route(route, months_ahead=3, min_duration=6, min_stay=7, max_stay=14,
                     departure_date,
                     return_date
                 )
+                
+                if take_screenshots:
+                    screenshot_name = f"{origin}_to_{destination}_{departure_date}_to_{return_date}.png"
+                    scraper.take_screenshot(screenshot_name)
                 
                 if results:
                     # Add dates to results
@@ -152,6 +166,9 @@ def main():
                         help='Sort results by this field')
     parser.add_argument('--limit', type=int, default=20, help='Limit number of results')
     parser.add_argument('--headless', action='store_true', help='Run browser in headless mode')
+    parser.add_argument('--use-proxy', action='store_true', help='Use proxy settings from .env file')
+    parser.add_argument('--disable-images', action='store_true', help='Disable images for faster loading')
+    parser.add_argument('--screenshots', action='store_true', help='Take screenshots of search results')
     
     args = parser.parse_args()
     
@@ -164,7 +181,10 @@ def main():
         max_stay=args.max_stay,
         sort_by=args.sort_by,
         limit=args.limit,
-        headless=args.headless
+        headless=args.headless,
+        use_proxy=args.use_proxy,
+        disable_images=args.disable_images,
+        take_screenshots=args.screenshots
     )
 
 if __name__ == "__main__":
