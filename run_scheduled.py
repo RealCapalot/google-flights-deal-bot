@@ -47,9 +47,9 @@ def run_search():
         # Initialize email sender
         email_sender = EmailSender(
             sender_email=os.getenv('EMAIL_SENDER', 'aleczooyork@gmail.com'),
-            sender_password=os.getenv('EMAIL_PASSWORD'),
-            recipient_email=os.getenv('EMAIL_RECIPIENT', 'alec.dc29@gmail.com')
+            sender_password=os.getenv('EMAIL_PASSWORD')
         )
+        recipient_email = os.getenv('EMAIL_RECIPIENT', 'alec.dc29@gmail.com')
         
         # Get current date and dates for next 100 days
         start_date = datetime.now().strftime("%Y-%m-%d")
@@ -115,7 +115,7 @@ def run_search():
             csv_path = scraper.export_to_csv(all_deals)
             
             # Send email with results
-            email_sender.send_deals_email(all_deals, screenshot_path, csv_path)
+            email_sender.send_deals_email(recipient_email, all_deals, screenshot_path, csv_path)
             logger.info(f"Found {len(all_deals)} deals and sent email")
         else:
             logger.info("No deals found")
