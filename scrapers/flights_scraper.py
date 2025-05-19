@@ -206,6 +206,10 @@ class GoogleFlightsScraper:
             return self._extract_flights_data(origin, destination, departure_date, return_date)
             
         except Exception as e:
+            # Capture d'écran automatique en cas d'erreur
+            screenshot_name = f"error_{origin}_{destination}_{departure_date}.png"
+            self.driver.save_screenshot(screenshot_name)
+            self.logger.error(f"Screenshot saved for error: {screenshot_name}")
             self.logger.exception("Error searching flights:")
             return []
     
