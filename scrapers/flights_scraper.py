@@ -63,6 +63,8 @@ class GoogleFlightsScraper:
         chrome_options.add_argument("--disable-extensions")
         chrome_options.add_argument("--disable-popup-blocking")
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        chrome_options.add_argument("--no-sandbox")  # Required for running in GitHub Actions
+        chrome_options.add_argument("--disable-dev-shm-usage")  # Required for running in GitHub Actions
         chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
         chrome_options.add_experimental_option("useAutomationExtension", False)
         
