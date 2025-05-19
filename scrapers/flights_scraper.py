@@ -6,8 +6,6 @@ import re
 import requests
 from datetime import datetime, timedelta
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -187,14 +185,17 @@ class GoogleFlightsScraper:
             chrome_prefs = {"profile.managed_default_content_settings.images": 2}
             chrome_options.add_experimental_option("prefs", chrome_prefs)
         
-        # Use the latest Chrome driver
+        # Use Selenium Manager to handle driver installation
         try:
-            service = Service(ChromeDriverManager().install())
+            from selenium.webdriver.chrome.service import Service
+            from selenium.webdriver.chrome.service import Service as ChromeService
+            from webdriver_manager.chrome import ChromeDriverManager
+            
+            service = ChromeService(ChromeDriverManager().install())
             self.driver = webdriver.Chrome(service=service, options=chrome_options)
         except Exception as e:
-            # Fallback to installed Chrome
-            service = Service(ChromeDriverManager(chrome_type=ChromeType.GOOGLE).install())
-            self.driver = webdriver.Chrome(service=service, options=chrome_options)
+            self.logger.error(f"Error setting up Chrome driver: {str(e)}")
+            raise
         
         # Set user agent to avoid detection
         self.driver.execute_cdp_cmd("Network.setUserAgentOverride", {
