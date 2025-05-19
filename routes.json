@@ -1,62 +1,44 @@
-[
-  {
-    "origin": "JFK",
-    "destination": "LHR",
-    "description": "New York to London"
-  },
-  {
-    "origin": "LAX",
-    "destination": "NRT",
-    "description": "Los Angeles to Tokyo"
-  },
-  {
-    "origin": "SFO",
-    "destination": "SYD",
-    "description": "San Francisco to Sydney"
-  },
-  {
-    "origin": "JFK",
-    "destination": "FCO",
-    "description": "New York to Rome"
-  },
-  {
-    "origin": "ORD",
-    "destination": "HKG",
-    "description": "Chicago to Hong Kong"
-  },
-  {
-    "origin": "LAX",
-    "destination": "SIN",
-    "description": "Los Angeles to Singapore"
-  },
-  {
-    "origin": "MIA",
-    "destination": "GRU",
-    "description": "Miami to São Paulo"
-  },
-  {
-    "origin": "JFK",
-    "destination": "DEL",
-    "description": "New York to Delhi"
-  },
-  {
-    "origin": "LAX",
-    "destination": "SYD",
-    "description": "Los Angeles to Sydney"
-  },
-  {
-    "origin": "SFO",
-    "destination": "SIN",
-    "description": "San Francisco to Singapore"
-  },
-  {
-    "origin": "JFK",
-    "destination": "CDG",
-    "description": "New York to Paris"
-  },
-  {
-    "origin": "SEA",
-    "destination": "ICN",
-    "description": "Seattle to Seoul"
-  }
-] 
+{
+    "routes": [
+        {
+            "origin": "CDG",
+            "destination": "JFK",
+            "description": "Paris to New York"
+        },
+        {
+            "origin": "CDG",
+            "destination": "LAX",
+            "description": "Paris to Los Angeles"
+        },
+        {
+            "origin": "CDG",
+            "destination": "SIN",
+            "description": "Paris to Singapore"
+        },
+        {
+            "origin": "CDG",
+            "destination": "HKG",
+            "description": "Paris to Hong Kong"
+        },
+        {
+            "origin": "CDG",
+            "destination": "SYD",
+            "description": "Paris to Sydney"
+        },
+        {
+            "origin": "CDG",
+            "destination": "DXB",
+            "description": "Paris to Dubai"
+        },
+        {
+            "origin": "CDG",
+            "destination": "BKK",
+            "description": "Paris to Bangkok"
+        },
+        {
+            "origin": "CDG",
+            "destination": "NRT",
+            "description": "Paris to Tokyo"
+        }
+    ]
+} 

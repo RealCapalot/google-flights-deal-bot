@@ -1,182 +1,97 @@
-# Google Flights Scraper for Long Flight Deals
+# Google Flights Deal Bot
 
-A Python-based tool to scrape Google Flights and find the best deals for long flights, with a focus on value (price per hour of flight time).
+An automated tool that searches for premium cabin flight deals (Business and First Class) from Google Flights. The bot monitors prices across multiple routes and sends email notifications when it finds significant discounts.
 
 ## Features
 
-- Scrapes Google Flights search results using Selenium
-- Focuses on long flights (configurable, default minimum 6 hours)
-- Finds the best deals based on multiple criteria:
-  - Lowest price
-  - Best price per hour (default)
-  - Longest duration
-  - Value score (normalized price per hour)
-- Supports one-way and round-trip searches
-- Date range generation for flexible travel dates
-- Scheduled scraping for continuous monitoring
-- Save results in JSON and CSV formats
-- Proxy support for avoiding rate limits
-- Data visualization tools and dashboards
-- Screenshot capabilities for search results
+- Searches for Business and First Class flights
+- Monitors prices up to 500 days in advance
+- Configurable stay durations (3-30 days)
+- Email notifications with:
+  - Direct Google Flights links
+  - Screenshots of search results
+  - CSV files with detailed information
+- Price tracking and discount analysis
+- Automated scheduling (runs every 6 hours)
+
+## Requirements
+
+- Python 3.8+
+- Chrome browser
+- Gmail account for notifications
 
 ## Installation
 
-1. Clone this repository:
-   ```
-   git clone <repository-url>
-   cd google_flights_scraper
-   ```
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/google-flights-deal-bot.git
+cd google-flights-deal-bot
+```
 
-2. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+2. Create and activate a virtual environment:
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-3. Make sure you have Chrome installed, as the scraper uses Chrome via Selenium.
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-4. (Optional) Copy the env.example file to .env and customize settings:
-   ```
-   cp env.example .env
-   ```
+4. Configure your email settings in `run_bot.py`:
+```python
+EMAIL_RECIPIENT = "your-email@example.com"
+EMAIL_SENDER = "your-gmail@gmail.com"
+EMAIL_PASSWORD = "your-app-specific-password"
+```
+
+5. Configure your routes in `routes.json`:
+```json
+{
+    "routes": [
+        {
+            "origin": "CDG",
+            "destination": "JFK"
+        }
+    ]
+}
+```
 
 ## Usage
 
-### Quick Search
-
-To run a quick search for flights between two locations:
-
+1. Start the bot:
 ```bash
-python main.py --origin SFO --destination NRT --headless
+./start_bot.sh
 ```
 
-### Advanced Options
+The bot will:
+- Run immediately and check for deals
+- Continue running every 6 hours
+- Send email notifications when good deals are found
+- Store price history for better deal detection
 
-The scraper supports several command-line options:
+## Configuration
 
-```bash
-python main.py --origin SFO --destination NRT \
-  --start-date 2023-12-01 --end-date 2024-03-01 \
-  --min-duration 8 --min-stay 10 --max-stay 21 \
-  --sort-by price --limit 10 --headless --disable-images
-```
+You can customize the bot's behavior by modifying these parameters in `run_bot.py`:
 
-### Example Script
+- `min_duration_hours`: Minimum flight duration (default: 6)
+- `premium_only`: Only search for Business and First class (default: True)
+- `discount_threshold`: Minimum discount percentage (default: 35%)
+- `max_days`: Maximum days to search ahead (default: 500)
+- `min_stay`: Minimum stay duration (default: 3 days)
+- `max_stay`: Maximum stay duration (default: 30 days)
 
-The included example.py script demonstrates a simple use case:
+## Security Notes
 
-```bash
-python example.py
-```
-
-This will:
-1. Search for flights from JFK to LHR
-2. Show the top 5 best deals
-3. Create a price visualization chart
-
-### Command Line Arguments
-
-- `--origin`: Origin airport code (e.g., SFO) - Required
-- `--destination`: Destination airport code (e.g., NRT) - Required
-- `--start-date`: Start date in YYYY-MM-DD format (defaults to today)
-- `--end-date`: End date in YYYY-MM-DD format (defaults to 3 months from today)
-- `--months-ahead`: Number of months ahead to search if start/end dates aren't provided (default: 3)
-- `--min-duration`: Minimum flight duration in hours (default: 6)
-- `--min-stay`: Minimum stay duration in days (default: 7)
-- `--max-stay`: Maximum stay duration in days (default: 14)
-- `--sort-by`: Sort results by this field - options: price, price_per_hour, duration_hours, value_score (default: price_per_hour)
-- `--limit`: Limit number of results (default: 20)
-- `--headless`: Run browser in headless mode (more efficient)
-- `--one-way`: Search for one-way flights only
-- `--use-proxy`: Use proxy settings from .env file
-- `--disable-images`: Disable images for faster loading
-- `--screenshot`: Take screenshots of search results pages
-
-## Scheduled Scraping
-
-For continuous monitoring, you can use the scheduler to check flights at regular intervals:
-
-1. Configure your routes in `routes.json`:
-   ```json
-   [
-     {
-       "origin": "SFO",
-       "destination": "NRT",
-       "description": "San Francisco to Tokyo"
-     }
-   ]
-   ```
-
-2. Run the scheduler:
-   ```bash
-   python scheduler.py --routes routes.json --interval 12 --headless
-   ```
-
-The scheduler will check each route every `interval` hours (default: 24).
-
-### Scheduler Options
-
-- `--routes`: Path to routes JSON file - Required
-- `--interval`: Job interval in hours (default: 24)
-- `--months-ahead`: Number of months ahead to search (default: 3)
-- `--min-duration`: Minimum flight duration in hours (default: 6)
-- `--min-stay`: Minimum stay duration in days (default: 7)
-- `--max-stay`: Maximum stay duration in days (default: 14)
-- `--sort-by`: Sort results by this field (default: price_per_hour)
-- `--limit`: Limit number of results (default: 20)
-- `--headless`: Run browser in headless mode
-- `--use-proxy`: Use proxy settings from .env file
-- `--disable-images`: Disable images for faster loading
-- `--screenshots`: Take screenshots of search results
-
-## Data Visualization
-
-Analyze your flight data with the included visualization tools:
-
-```bash
-python visualize.py --all
-```
-
-This will generate visualization charts for all saved flight data.
-
-Options:
-- `--file`: Visualize a specific data file (e.g., `--file data/JFK_to_LHR_20230101_120000.json`)
-- `--all`: Generate visualizations for all data files
-- `--output-dir`: Directory to save visualization files (default: 'visualizations')
-
-## Proxy Support
-
-To use a proxy for scraping:
-
-1. Configure proxy settings in your .env file:
-   ```
-   USE_PROXY=true
-   PROXY_HOST=your-proxy-host
-   PROXY_PORT=your-proxy-port
-   PROXY_USER=your-username (optional)
-   PROXY_PASS=your-password (optional)
-   ```
-
-2. Enable proxy use with the `--use-proxy` flag:
-   ```bash
-   python main.py --origin SFO --destination NRT --use-proxy
-   ```
-
-## Results
-
-Results are saved in the `data` directory as both JSON and CSV files, named with the format:
-`{origin}_to_{destination}_{timestamp}.json/csv`
-
-## Notes
-
-- Google Flights may detect and block automated scraping. The scraper includes several anti-detection measures but may still get blocked.
-- To minimize blocking risk, use reasonable time delays between requests.
-- Consider using a proxy or VPN if you experience blocking.
-- This tool is for educational purposes only.
-
-## Disclaimer
-
-This tool is for personal use only. Using this tool may violate Google's Terms of Service. The author takes no responsibility for any consequences of using this tool.
+- Never commit your email password or API keys
+- Use environment variables or a secure configuration file
+- Keep your `price_database.json` local and backed up
 
 ## License
 
-MIT 
+MIT License - feel free to use this project for personal or commercial purposes.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. 
