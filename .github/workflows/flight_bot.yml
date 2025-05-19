@@ -45,4 +45,11 @@ jobs:
         EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
         EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
       run: |
-        python run_scheduled.py 
+        python run_scheduled.py
+
+    - name: Upload screenshots as artifacts
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: flight-screenshots
+        path: screenshots/ 
