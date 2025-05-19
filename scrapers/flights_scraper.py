@@ -211,8 +211,6 @@ class GoogleFlightsScraper:
             self.driver.save_screenshot(screenshot_name)
             self.logger.error(f"Screenshot saved for error: {screenshot_name}")
             self.logger.exception("Error searching flights:")
-            import sys
-            sys.exit(1)
             return []
     
     def _extract_flights_data(self, origin, destination, departure_date, return_date=None):
