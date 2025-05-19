@@ -16,6 +16,8 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.os_manager import ChromeType
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from tqdm import tqdm
 
 class GoogleFlightsScraper:
     def __init__(self, headless=True, min_duration_hours=6, proxy_url=None, disable_images=True, premium_only=False):
@@ -642,9 +644,9 @@ class GoogleFlightsScraper:
         
         return filepath
     
-    def get_multiple_date_options(self, origin, destination, start_date, num_days=5, return_trip=False, days_between=7):
+    def get_multiple_date_options(self, origin, destination, start_date, num_days=100, return_trip=False, days_between=7, max_workers=10):
         """
-        Search for flights across multiple dates.
+        Search for flights across multiple dates using parallel processing.
         
         Args:
             origin (str): Origin airport code
@@ -653,35 +655,51 @@ class GoogleFlightsScraper:
             num_days (int): Number of departure dates to check
             return_trip (bool): Whether to include return flights
             days_between (int): For return trips, days between departure and return
+            max_workers (int): Maximum number of parallel workers
             
         Returns:
             dict: Dictionary with dates as keys and flight lists as values
         """
         results = {}
-        
-        # Parse start date
         start = datetime.strptime(start_date, "%Y-%m-%d")
+        dates_to_search = []
         
+        # Generate all dates to search
         for i in range(num_days):
-            # Calculate current departure date
             current_date = start + timedelta(days=i)
             departure_date = current_date.strftime("%Y-%m-%d")
-            
-            # Calculate return date if needed
             return_date = None
             if return_trip:
                 return_date = (current_date + timedelta(days=days_between)).strftime("%Y-%m-%d")
+            dates_to_search.append((departure_date, return_date))
+        
+        # Function to search a single date
+        def search_single_date(date_info):
+            departure_date, return_date = date_info
+            try:
+                self.logger.info(f"Searching date: {departure_date}")
+                flights = self.search_flights(origin, destination, departure_date, return_date)
+                return departure_date, flights
+            except Exception as e:
+                self.logger.error(f"Error searching date {departure_date}: {str(e)}")
+                return departure_date, []
+        
+        # Use ThreadPoolExecutor for parallel processing
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Submit all tasks
+            future_to_date = {
+                executor.submit(search_single_date, date_info): date_info 
+                for date_info in dates_to_search
+            }
             
-            # Search for flights
-            self.logger.info(f"Searching date option {i+1}/{num_days}: {departure_date}")
-            flights = self.search_flights(origin, destination, departure_date, return_date)
-            
-            # Store results
-            results[departure_date] = flights
-            
-            # Short pause between searches to avoid rate limiting
-            if i < num_days - 1:
-                time.sleep(3)
+            # Process results as they complete
+            for future in tqdm(as_completed(future_to_date), total=len(dates_to_search), desc="Searching dates"):
+                date_info = future_to_date[future]
+                try:
+                    departure_date, flights = future.result()
+                    results[departure_date] = flights
+                except Exception as e:
+                    self.logger.error(f"Error processing results for date {date_info[0]}: {str(e)}")
         
         return results
     
