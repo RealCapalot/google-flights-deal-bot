@@ -17,10 +17,10 @@ from extended_search import run_extended_search
 from scrapers.email_sender import EmailSender
 from scrapers.flights_scraper import GoogleFlightsScraper
 
-# Email configuration
-EMAIL_RECIPIENT = "alec.dc29@gmail.com"
-EMAIL_SENDER = "aleczooyork@gmail.com"
-EMAIL_PASSWORD = "vjgd inkg gjle ksmv"
+# Email configuration from environment variables
+EMAIL_RECIPIENT = os.getenv('EMAIL_RECIPIENT', 'alec.dc29@gmail.com')
+EMAIL_SENDER = os.getenv('EMAIL_SENDER', 'aleczooyork@gmail.com')
+EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD', 'vjgd inkg gjle ksmv')
 
 def run_bot():
     """Run the flight deal bot with email notifications"""
