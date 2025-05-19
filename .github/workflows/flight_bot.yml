@@ -47,9 +47,16 @@ jobs:
       run: |
         python run_scheduled.py
 
+    - name: Upload screenshots as artifacts (intermediate)
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: flight-screenshots-intermediate
+        path: screenshots/
+
     - name: Upload screenshots as artifacts
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: flight-screenshots
         path: screenshots/ 
