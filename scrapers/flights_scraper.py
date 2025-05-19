@@ -206,7 +206,7 @@ class GoogleFlightsScraper:
             return self._extract_flights_data(origin, destination, departure_date, return_date)
             
         except Exception as e:
-            self.logger.error(f"Error searching flights: {str(e)}")
+            self.logger.exception("Error searching flights:")
             return []
     
     def _extract_flights_data(self, origin, destination, departure_date, return_date=None):
