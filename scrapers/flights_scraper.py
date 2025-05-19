@@ -16,6 +16,7 @@ from webdriver_manager.core.os_manager import ChromeType
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
+from selenium.webdriver.common.by import By
 
 class GoogleFlightsScraper:
     def __init__(self, headless=True, min_duration_hours=6, proxy_url=None, disable_images=True, premium_only=False):
