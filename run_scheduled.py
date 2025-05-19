@@ -130,10 +130,10 @@ def main():
     # Run immediately on startup
     run_search()
     
-    # Schedule to run every 4 hours
-    schedule.every(4).hours.do(run_search)
+    # Schedule to run every hour
+    schedule.every(1).hours.do(run_search)
     
-    logger.info("Bot scheduler started. Running every 4 hours.")
+    logger.info("Bot scheduler started. Running every hour.")
     
     # Keep the script running
     while True:
